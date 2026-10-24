@@ -34,7 +34,7 @@ local HALLOWEEN_PALETTE = {
 local currentTheme = "BLUE"
 local mini
 local leafLayer
-local prefs = {scan = false, scope = false, spam = false, hideUser = false, auto = 5, scale = 0.65}
+local prefs = {scan = false, scope = false, spam = false, hideUser = false, auto = 5, scale = 0.85}
 local currentCode = ""
 
 local function make(className, props, parent)
@@ -78,21 +78,21 @@ local gui = make("ScreenGui", {
 }, playerGui)
 local main = make("Frame", {
  Name = "Main", AnchorPoint = Vector2.new(.5,.5), Position = UDim2.fromScale(.5,.5),
- Size = UDim2.fromOffset(360, 460), BackgroundColor3 = C.BG,
+ Size = UDim2.fromOffset(320, 520), BackgroundColor3 = C.BG,
  BorderSizePixel = 0, Active = true, ClipsDescendants = true
 }, gui)
 corner(main, 13); outline(main, C.BORDER, 1.4)
 leafLayer = make("Frame", {
- Name = "HalloweenLeaves", Size = UDim2.fromScale(1,1),
+ Name = "ThemeParticles", Size = UDim2.fromScale(1,1),
  BackgroundTransparency = 1, BorderSizePixel = 0, ClipsDescendants = true,
- Active = false, Visible = false, ZIndex = 50
+ Active = false, Visible = true, ZIndex = 50
 }, main)
 local uiScale = make("UIScale", {Scale = 1}, main)
 local function resize()
  local camera = workspace.CurrentCamera
  if not camera then return end
  local v = camera.ViewportSize
- uiScale.Scale = math.clamp(math.min((v.X - 18)/360, (v.Y - 18)/460, prefs.scale), .55, 1)
+ uiScale.Scale = math.clamp(math.min((v.X - 18)/320, (v.Y - 18)/520, prefs.scale), .55, 1)
 end
 resize()
 if workspace.CurrentCamera then workspace.CurrentCamera:GetPropertyChangedSignal("ViewportSize"):Connect(resize) end
@@ -150,7 +150,7 @@ button(rail, "SETTINGS", UDim2.new(1,-8,0,28), UDim2.fromOffset(4,64), function(
 end, C.ROW).TextSize = 6
 text(rail, "❄", UDim2.new(1,0,0,20), UDim2.new(0,0,1,-24), 12, C.BLUE, true)
 
-content = make("Frame", {Name = "MainContent", Position = UDim2.fromOffset(69,49), Size = UDim2.new(1,-77,1,-56), BackgroundTransparency = 1}, main)
+content = make("ScrollingFrame", {Name = "MainContent", Position = UDim2.fromOffset(69,49), Size = UDim2.new(1,-77,1,-56), BackgroundTransparency = 1, BorderSizePixel = 0, ScrollBarThickness = 4, ScrollBarImageColor3 = C.BLUE, CanvasSize = UDim2.new(0,0,0,300), ScrollingDirection = Enum.ScrollingDirection.Y, Active = true}, main)
 
 -- Top row and sniped-code card
 local topRow = make("Frame", {Size = UDim2.new(1,0,0,18), BackgroundTransparency = 1}, content)
@@ -230,7 +230,7 @@ for i=1,5 do
 end
 
 -- Bottom action buttons
-local bottom = make("Frame", {Position = UDim2.new(0,0,1,-27), Size = UDim2.new(1,0,0,25), BackgroundTransparency = 1}, content)
+local bottom = make("Frame", {Position = UDim2.fromOffset(0,264), Size = UDim2.new(1,0,0,25), BackgroundTransparency = 1}, content)
 local fragmentBox = make("TextBox", {
  Size = UDim2.new(.68,-4,1,0), Position = UDim2.new(0,0,0,0),
  BackgroundColor3 = C.ROW, BorderSizePixel = 0, ClearTextOnFocus = false,
@@ -301,7 +301,7 @@ local function applyTheme(theme)
   local miniStroke = mini:FindFirstChildOfClass("UIStroke")
   if miniStroke then miniStroke.Color = newPalette.BLUE end
  end
- if leafLayer then leafLayer.Visible = theme == "HALLOWEEN" end
+ if leafLayer then leafLayer.Visible = true end
 end
 
 local themeButton
@@ -359,17 +359,17 @@ UIS.InputEnded:Connect(function(input)
  end
 end)
 
--- Halloween-only falling leaf animation. This is a visual effect inside the panel.
+-- Theme particles: falling snow in Arctic Blue and leaves in Halloween mode.
 task.spawn(function()
  while gui.Parent do
   task.wait(0.32)
-  if currentTheme == "HALLOWEEN" and leafLayer and leafLayer.Visible then
+  if leafLayer and leafLayer.Visible then
    local leaf = make("TextLabel", {
     BackgroundTransparency = 1, Size = UDim2.fromOffset(math.random(13,21), math.random(13,21)),
     Position = UDim2.new(math.random(2,98)/100, 0, 0, -24),
-    Text = ({"🍂","🍁","🍃"})[math.random(1,3)],
+    Text = currentTheme == "HALLOWEEN" and ({"🍂","🍁","🍃"})[math.random(1,3)] or ({"❄","❅","❆"})[math.random(1,3)],
     TextSize = math.random(12,18), TextTransparency = 0.08,
-    Rotation = math.random(-35,35), TextColor3 = Color3.fromRGB(255, 143, 45),
+    Rotation = math.random(-35,35), TextColor3 = currentTheme == "HALLOWEEN" and Color3.fromRGB(255, 143, 45) or Color3.fromRGB(170, 225, 255),
     Font = Enum.Font.Gotham, BorderSizePixel = 0, Active = false,
     ZIndex = 51
    }, leafLayer)
