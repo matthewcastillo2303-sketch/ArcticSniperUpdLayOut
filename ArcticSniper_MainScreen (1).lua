@@ -326,12 +326,11 @@ end, C.BLUE_DARK)
 
 -- This scans text the user supplies; it does not read another game's private banner UI.
 
--- Local-only top-of-screen announcement banner, similar to the example video.
--- It is only a visual test on this player's screen; it never sends to a server.
+-- Local-only floating banner styled after the reference: no card, just an icon and outlined text.
+-- This remains a visual test on this player's screen only.
 local bannerToken = 0
 local oldBannerGui = playerGui:FindFirstChild("ArcticSniperTestBanner")
 if oldBannerGui then oldBannerGui:Destroy() end
--- Separate ScreenGui guarantees the banner is outside the Arctic Sniper panel.
 local bannerGui = make("ScreenGui", {
  Name = "ArcticSniperTestBanner", ResetOnSpawn = false,
  IgnoreGuiInset = true, DisplayOrder = 10000,
@@ -340,33 +339,23 @@ local bannerGui = make("ScreenGui", {
 local testBanner = make("Frame", {
  Name = "ArcticTestAnnouncementBanner",
  AnchorPoint = Vector2.new(0.5, 0),
- Position = UDim2.new(0.5, 0, 0, 70),
- Size = UDim2.new(0.82, 0, 0, 76),
- BackgroundColor3 = C.PANEL, BorderSizePixel = 0,
+ Position = UDim2.new(0.5, 0, 0, 64),
+ Size = UDim2.new(0.9, 0, 0, 46),
+ BackgroundTransparency = 1, BorderSizePixel = 0,
  Visible = false, ZIndex = 1000
 }, bannerGui)
-corner(testBanner, 10); outline(testBanner, C.BLUE, 1.5)
-local bannerAccent = make("Frame", {
- Name = "Accent", Position = UDim2.fromOffset(0, 0),
- Size = UDim2.new(0, 4, 1, 0), BackgroundColor3 = C.BLUE,
- BorderSizePixel = 0, ZIndex = 101
-}, testBanner)
-corner(bannerAccent, 4)
-local bannerTitle = text(testBanner, "📢  ARCTIC SNIPER • TEST ANNOUNCEMENT",
- UDim2.new(1, -52, 0, 23), UDim2.fromOffset(13, 5), 9, C.BLUE, false, Enum.Font.GothamBold)
-bannerTitle.ZIndex = 1001
-local bannerBody = text(testBanner, "", UDim2.new(1, -48, 0, 32),
- UDim2.fromOffset(13, 28), 12, C.WHITE, false, Enum.Font.GothamSemibold)
+local bannerIcon = text(testBanner, "📣", UDim2.fromOffset(38, 42),
+ UDim2.fromOffset(0, 0), 28, C.WHITE, true, Enum.Font.GothamBold)
+bannerIcon.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+bannerIcon.TextStrokeTransparency = 0
+bannerIcon.ZIndex = 1001
+local bannerBody = text(testBanner, "", UDim2.new(1, -42, 1, 0),
+ UDim2.fromOffset(40, 0), 25, C.WHITE, false, Enum.Font.GothamBold)
 bannerBody.TextYAlignment = Enum.TextYAlignment.Center
+bannerBody.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+bannerBody.TextStrokeTransparency = 0
+bannerBody.TextScaled = true
 bannerBody.ZIndex = 1001
-local bannerClose = make("TextButton", {
- Name = "CloseBanner", Size = UDim2.fromOffset(25, 25),
- Position = UDim2.new(1, -31, 0, 5), BackgroundColor3 = C.ROW,
- BorderSizePixel = 0, Text = "×", TextColor3 = C.WHITE,
- TextSize = 18, Font = Enum.Font.GothamBold, ZIndex = 1002
-}, testBanner)
-corner(bannerClose, 7)
-bannerClose.Activated:Connect(function() testBanner.Visible = false end)
 
 -- Local-only announcement tester. Nothing is sent to a server or other players.
 testerPanel = make("Frame", {
