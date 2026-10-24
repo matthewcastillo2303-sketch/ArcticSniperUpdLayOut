@@ -489,25 +489,26 @@ local function applyTheme(theme)
 end
 
 local themeTabs = {}
-local function makeThemeTab(theme, label, xScale, xOffset, paletteColor)
- local tab = button(settingsPanel, label, UDim2.new(1/4, -8, 0, 38), UDim2.new(xScale, xOffset, 0, 66), function()
+local function makeThemeTab(theme, label, xScale, yOffset, paletteColor)
+ local tab = button(settingsPanel, label, UDim2.new(1/2, -15, 0, 34), UDim2.new(xScale, xScale == 0 and 8 or 7, 0, yOffset), function()
   applyTheme(theme)
  end, paletteColor)
  tab.Name = theme
- tab.TextSize = 8
+ tab.TextSize = 9
  tab.ZIndex = 21
  themeTabs[theme] = tab
  return tab
 end
-makeThemeTab("BLUE", "❄ NORMAL", 0, 8, C.BLUE_DARK)
-makeThemeTab("HALLOWEEN", "🎃 HALLOWEEN", 1/4, 4, C.ROW)
-makeThemeTab("CHRISTMAS", "🎄 XMAS", 1/2, 0, C.ROW)
-makeThemeTab("THANKSGIVING", "🦃 THANKS", 3/4, -4, C.ROW)
-local backButton = button(settingsPanel, "BACK TO MAIN", UDim2.new(1,-20,0,30), UDim2.fromOffset(10,109), function()
+-- Two rows keep all four theme choices visible on narrow mobile screens.
+makeThemeTab("BLUE", "❄ NORMAL", 0, 66, C.BLUE_DARK)
+makeThemeTab("HALLOWEEN", "🎃 HALLOWEEN", 1/2, 66, C.ROW)
+makeThemeTab("CHRISTMAS", "🎄 CHRISTMAS", 0, 106, C.ROW)
+makeThemeTab("THANKSGIVING", "🦃 THANKSGIVING", 1/2, 106, C.ROW)
+local backButton = button(settingsPanel, "BACK TO MAIN", UDim2.new(1,-20,0,30), UDim2.fromOffset(10,148), function()
  settingsPanel.Visible = false
 end, C.ROW)
 backButton.ZIndex = 21
-text(settingsPanel, "Pick a seasonal look: Thanksgiving brings harvest colors and falling leaves.", UDim2.new(1,-20,0,30), UDim2.fromOffset(10,148), 8, C.MUTED).ZIndex = 21
+text(settingsPanel, "Thanksgiving: harvest colors and falling autumn leaves.", UDim2.new(1,-20,0,30), UDim2.fromOffset(184,148), 8, C.MUTED).ZIndex = 21
 persistenceLabel = text(settingsPanel, persistenceState, UDim2.new(1,-20,0,24), UDim2.fromOffset(10,184), 7, C.MUTED)
 persistenceLabel.ZIndex = 21
 
