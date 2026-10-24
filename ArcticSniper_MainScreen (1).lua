@@ -386,31 +386,21 @@ local announcementInput = make("TextBox", {
  ZIndex = 21
 }, testerPanel)
 corner(announcementInput, 8); outline(announcementInput)
-local previewCard = make("Frame", {
- Name = "AnnouncementPreview", Size = UDim2.new(1,-20,0,112), Position = UDim2.fromOffset(10,145),
- BackgroundColor3 = C.PANEL, BorderSizePixel = 0, ZIndex = 21
-}, testerPanel)
-corner(previewCard, 8); outline(previewCard)
-text(previewCard, "📢  TEST ANNOUNCEMENT", UDim2.new(1,-16,0,24), UDim2.fromOffset(8,6), 9, C.BLUE, false, Enum.Font.GothamBold).ZIndex = 22
-local announcementPreview = text(previewCard, "Your test announcement will appear here.", UDim2.new(1,-16,1,-38), UDim2.fromOffset(8,31), 10, C.WHITE)
-announcementPreview.TextYAlignment = Enum.TextYAlignment.Top
-announcementPreview.ZIndex = 22
-local previewStatus = text(testerPanel, "LOCAL PREVIEW ONLY • NOT SENT TO ANYONE", UDim2.new(1,-20,0,22), UDim2.fromOffset(10,263), 7, C.GREEN, true)
+local previewStatus = text(testerPanel, "LOCAL TEST ONLY • NOT SENT TO ANYONE",
+ UDim2.new(1,-20,0,26), UDim2.fromOffset(10,145), 8, C.GREEN, true)
 previewStatus.ZIndex = 21
-local showTestButton = button(testerPanel, "SHOW TEST", UDim2.new(.58,-13,0,30), UDim2.fromOffset(10,294), function()
+local showTestButton = button(testerPanel, "SEND TEST BANNER", UDim2.new(.62,-13,0,32), UDim2.fromOffset(10,181), function()
  local message = string.gsub(announcementInput.Text or "", "^%s*(.-)%s*$", "%1")
  if message == "" then
-  announcementPreview.Text = "Type a message above first."
-  previewStatus.Text = "NOTHING TO PREVIEW"
+  previewStatus.Text = "TYPE A MESSAGE FIRST"
   previewStatus.TextColor3 = C.MUTED
   return
  end
- announcementPreview.Text = message
  bannerBody.Text = message
  testBanner.Visible = true
  bannerToken = bannerToken + 1
  local thisToken = bannerToken
- previewStatus.Text = "BANNER SHOWN LOCALLY • NOT SENT"
+ previewStatus.Text = "BANNER SHOWN ON YOUR SCREEN"
  previewStatus.TextColor3 = C.GREEN
  task.delay(5, function()
   if bannerToken == thisToken and testBanner and testBanner.Parent then
@@ -419,11 +409,11 @@ local showTestButton = button(testerPanel, "SHOW TEST", UDim2.new(.58,-13,0,30),
  end)
 end, C.BLUE_DARK)
 showTestButton.ZIndex = 21
-local clearTestButton = button(testerPanel, "CLEAR", UDim2.new(.42,-7,0,30), UDim2.new(.58,3,0,294), function()
+local clearTestButton = button(testerPanel, "CLEAR", UDim2.new(.38,-7,0,32), UDim2.new(.62,3,0,181), function()
  announcementInput.Text = ""
- announcementPreview.Text = "Your test announcement will appear here."
- previewStatus.Text = "LOCAL PREVIEW ONLY • NOT SENT TO ANYONE"
+ previewStatus.Text = "LOCAL TEST ONLY • NOT SENT TO ANYONE"
  previewStatus.TextColor3 = C.GREEN
+ testBanner.Visible = false
 end, C.ROW)
 clearTestButton.ZIndex = 21
 local testerBackButton = button(testerPanel, "BACK TO MAIN", UDim2.new(1,-20,0,26), UDim2.fromOffset(10,332), function()
