@@ -34,7 +34,7 @@ local HALLOWEEN_PALETTE = {
 local currentTheme = "BLUE"
 local mini
 local leafLayer
-local prefs = {scan = false, scope = false, spam = false, hideUser = false, auto = 5, scale = 0.76}
+local prefs = {scan = false, scope = false, spam = false, hideUser = false, auto = 5, scale = 0.85}
 local currentCode = ""
 
 local function make(className, props, parent)
@@ -78,7 +78,7 @@ local gui = make("ScreenGui", {
 }, playerGui)
 local main = make("Frame", {
  Name = "Main", AnchorPoint = Vector2.new(.5,.5), Position = UDim2.fromScale(.5,.5),
- Size = UDim2.fromOffset(480, 340), BackgroundColor3 = C.BG,
+ Size = UDim2.fromOffset(360, 460), BackgroundColor3 = C.BG,
  BorderSizePixel = 0, Active = true, ClipsDescendants = true
 }, gui)
 corner(main, 13); outline(main, C.BORDER, 1.4)
@@ -92,7 +92,7 @@ local function resize()
  local camera = workspace.CurrentCamera
  if not camera then return end
  local v = camera.ViewportSize
- uiScale.Scale = math.clamp(math.min((v.X - 18)/480, (v.Y - 18)/340, prefs.scale), .55, 1)
+ uiScale.Scale = math.clamp(math.min((v.X - 18)/360, (v.Y - 18)/460, prefs.scale), .55, 1)
 end
 resize()
 if workspace.CurrentCamera then workspace.CurrentCamera:GetPropertyChangedSignal("ViewportSize"):Connect(resize) end
