@@ -8,6 +8,7 @@ redeeming is not implemented, and toggles without backing systems are visual pre
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local UIS = game:GetService("UserInputService")
+local HttpService = game:GetService("HttpService")
 local player = Players.LocalPlayer
 if not player then return end
 local playerGui = player:WaitForChild("PlayerGui")
@@ -34,7 +35,33 @@ local HALLOWEEN_PALETTE = {
 local currentTheme = "BLUE"
 local mini
 local leafLayer
-local prefs = {scan = false, scope = false, spam = false, hideUser = false, auto = 5, scale = 0.85}
+local SETTINGS_FILE = "ArcticSniper_Settings.json"
+local prefs = {scan = false, scope = false, spam = false, hideUser = false, auto = 5, scale = 0.85, theme = "BLUE"}
+
+-- Save/load is supported only in executors that provide readfile/writefile.
+local function loadSettings()
+ if type(readfile) ~= "function" or type(writefile) ~= "function" then return end
+ local ok, raw = pcall(readfile, SETTINGS_FILE)
+ if not ok or type(raw) ~= "string" then return end
+ local decodedOk, data = pcall(function() return HttpService:JSONDecode(raw) end)
+ if not decodedOk or type(data) ~= "table" then return end
+ for _, key in ipairs({"scan", "scope", "spam", "hideUser"}) do
+  if type(data[key]) == "boolean" then prefs[key] = data[key] end
+ end
+ if type(data.auto) == "number" then prefs.auto = math.clamp(math.floor(data.auto), 1, 5) end
+ if type(data.scale) == "number" then prefs.scale = math.clamp(data.scale, 0.55, 1) end
+ if data.theme == "BLUE" or data.theme == "HALLOWEEN" then prefs.theme = data.theme end
+end
+local function saveSettings()
+ if type(writefile) ~= "function" then return end
+ local data = {
+  scan = prefs.scan, scope = prefs.scope, spam = prefs.spam, hideUser = prefs.hideUser,
+  auto = prefs.auto, scale = prefs.scale, theme = prefs.theme
+ }
+ local ok, encoded = pcall(function() return HttpService:JSONEncode(data) end)
+ if ok then pcall(writefile, SETTINGS_FILE, encoded) end
+end
+loadSettings()
 local currentCode = ""
 
 local function make(className, props, parent)
@@ -197,12 +224,13 @@ end
 
 toggleRow(91, "scan announcements", "Paste fragments below; scanner does not read private game UI", prefs.scan, function(v)
  prefs.scan = v
+ saveSettings()
  codeHint.Text = v and "Paste fragments below, then press SCAN TEXT" or "Scanner paused"
  codeHint.TextColor3 = v and C.BLUE or C.MUTED
 end)
-toggleRow(127, "auto scope", "Preference toggle only", prefs.scope, function(v) prefs.scope=v end)
-toggleRow(163, "spam redeem", "Preview preference; no redemption calls", prefs.spam, function(v) prefs.spam=v end)
-toggleRow(199, "hide user", "Visual preference only", prefs.hideUser, function(v) prefs.hideUser=v end)
+toggleRow(127, "auto scope", "Preference toggle only", prefs.scope, function(v) prefs.scope=v; saveSettings() end)
+toggleRow(163, "spam redeem", "Preview preference; no redemption calls", prefs.spam, function(v) prefs.spam=v; saveSettings() end)
+toggleRow(199, "hide user", "Visual preference only", prefs.hideUser, function(v) prefs.hideUser=v; saveSettings() end)
 
 -- Auto submit selector
 local autoRow = make("Frame", {Position = UDim2.fromOffset(0,222), Size = UDim2.new(1,0,0,27), BackgroundColor3 = C.ROW, BorderSizePixel = 0}, content)
@@ -213,6 +241,7 @@ local choices = make("Frame", {Position = UDim2.new(.44,0,0,4), Size = UDim2.new
 local choiceButtons = {}
 local function setAuto(n)
  prefs.auto = n
+ saveSettings()
  for i, b in ipairs(choiceButtons) do
   b.BackgroundColor3 = i == n and C.BLUE_DARK or C.PANEL
   b.TextColor3 = i == n and C.WHITE or C.MUTED
@@ -295,6 +324,8 @@ local function applyTheme(theme)
  C.HOVER = newPalette.HOVER
  C.MUTED = newPalette.MUTED
  currentTheme = theme
+ prefs.theme = theme
+ saveSettings()
  if mini then
   mini.Text = theme == "HALLOWEEN" and "🎃 AS" or "❄ AS"
   mini.BackgroundColor3 = theme == "HALLOWEEN" and Color3.fromRGB(77, 35, 13) or C.PANEL
@@ -386,5 +417,14 @@ end)
 local minimize = button(header, "—", UDim2.fromOffset(22,22), UDim2.new(1,-55,0,9), function()
  main.Visible = false; mini.Visible = true
 end, C.ROW)
+
+-- Apply the saved theme after the UI and minimized button exist.
+if prefs.theme == "HALLOWEEN" then
+ applyTheme("HALLOWEEN")
+ themeButton.Text = "Switch to Arctic Blue"
+else
+ themeButton.Text = "Switch to Halloween Orange"
+end
+saveSettings()
 
 print("Arctic Sniper Main Screen loaded (local UI demo)")
