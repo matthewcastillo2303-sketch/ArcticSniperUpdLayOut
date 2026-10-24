@@ -32,6 +32,12 @@ local HALLOWEEN_PALETTE = {
  BORDER = Color3.fromRGB(130, 68, 27), ROW = Color3.fromRGB(35, 24, 20),
  HOVER = Color3.fromRGB(57, 34, 22), MUTED = Color3.fromRGB(190, 151, 122)
 }
+local CHRISTMAS_PALETTE = {
+ BLUE = Color3.fromRGB(70, 220, 125), BLUE_DARK = Color3.fromRGB(145, 28, 42),
+ BORDER = Color3.fromRGB(35, 130, 75), ROW = Color3.fromRGB(24, 47, 37),
+ HOVER = Color3.fromRGB(35, 68, 48), MUTED = Color3.fromRGB(155, 205, 170)
+}
+local THEME_PALETTES = {BLUE = BLUE_PALETTE, HALLOWEEN = HALLOWEEN_PALETTE, CHRISTMAS = CHRISTMAS_PALETTE}
 local currentTheme = "BLUE"
 local mini
 local leafLayer
@@ -63,7 +69,7 @@ local function loadSettings()
  end
  if type(data.auto) == "number" then prefs.auto = math.clamp(math.floor(data.auto), 1, 5) end
  if type(data.scale) == "number" then prefs.scale = math.clamp(data.scale, 0.55, 1) end
- if data.theme == "BLUE" or data.theme == "HALLOWEEN" then prefs.theme = data.theme end
+ if data.theme == "BLUE" or data.theme == "HALLOWEEN" or data.theme == "CHRISTMAS" then prefs.theme = data.theme end
  persistenceState = "SETTINGS LOADED"
 end
 local function saveSettings()
@@ -421,7 +427,7 @@ local testerBackButton = button(testerPanel, "BACK TO MAIN", UDim2.new(1,-20,0,2
 end, C.ROW)
 testerBackButton.ZIndex = 21
 
--- Settings panel: choose between standard blue and Halloween orange.
+-- Settings panel: choose between Arctic Blue, Halloween, and Christmas themes.
 settingsPanel = make("Frame", {
  Name = "SettingsPanel", Position = UDim2.fromOffset(0,0), Size = UDim2.fromScale(1,1),
  BackgroundColor3 = C.BG, BorderSizePixel = 0, Visible = false, ZIndex = 20
@@ -431,8 +437,9 @@ text(settingsPanel, "SETTINGS", UDim2.new(1,-20,0,26), UDim2.fromOffset(10,8), 1
 text(settingsPanel, "Choose your Arctic Sniper color theme", UDim2.new(1,-20,0,20), UDim2.fromOffset(10,35), 8, C.MUTED).ZIndex = 21
 
 local function applyTheme(theme)
- local oldPalette = currentTheme == "BLUE" and BLUE_PALETTE or HALLOWEEN_PALETTE
- local newPalette = theme == "BLUE" and BLUE_PALETTE or HALLOWEEN_PALETTE
+ if not THEME_PALETTES[theme] then theme = "BLUE" end
+ local oldPalette = THEME_PALETTES[currentTheme] or BLUE_PALETTE
+ local newPalette = THEME_PALETTES[theme]
  for _, obj in ipairs(gui:GetDescendants()) do
   for _, prop in ipairs({"BackgroundColor3", "TextColor3", "PlaceholderColor3"}) do
    local ok, value = pcall(function() return obj[prop] end)
@@ -461,21 +468,36 @@ local function applyTheme(theme)
  prefs.theme = theme
  saveSettings()
  if mini then
-  mini.Text = theme == "HALLOWEEN" and "🎃 AS" or "❄ AS"
-  mini.BackgroundColor3 = theme == "HALLOWEEN" and Color3.fromRGB(77, 35, 13) or C.PANEL
+  mini.Text = theme == "HALLOWEEN" and "🎃 AS" or (theme == "CHRISTMAS" and "🎄 AS" or "❄ AS")
+  mini.BackgroundColor3 = theme == "HALLOWEEN" and Color3.fromRGB(77, 35, 13) or (theme == "CHRISTMAS" and Color3.fromRGB(105, 22, 36) or C.PANEL)
   local miniStroke = mini:FindFirstChildOfClass("UIStroke")
   if miniStroke then miniStroke.Color = newPalette.BLUE end
  end
  if leafLayer then leafLayer.Visible = true end
+ for _, tab in pairs(themeTabs or {}) do
+  if tab and tab.Parent then
+   local selected = tab.Name == theme
+   tab.BackgroundColor3 = selected and newPalette.BLUE_DARK or newPalette.ROW
+   tab.TextColor3 = selected and Color3.fromRGB(255,255,255) or newPalette.MUTED
+  end
+ end
 end
 
-local themeButton
-themeButton = button(settingsPanel, "Switch to Halloween Orange", UDim2.new(1,-20,0,34), UDim2.fromOffset(10,66), function()
- local nextTheme = currentTheme == "BLUE" and "HALLOWEEN" or "BLUE"
- applyTheme(nextTheme)
- themeButton.Text = nextTheme == "BLUE" and "Switch to Halloween Orange" or "Switch to Arctic Blue"
-end, C.BLUE_DARK)
-themeButton.ZIndex = 21
+local themeTabs = {}
+local themeTabWidth = (1 - 20 - 12) / 3
+local function makeThemeTab(theme, label, xScale, paletteColor)
+ local tab = button(settingsPanel, label, UDim2.new(themeTabWidth, 0, 0, 38), UDim2.new(xScale, 0, 0, 66), function()
+  applyTheme(theme)
+ end, paletteColor)
+ tab.Name = theme
+ tab.TextSize = 8
+ tab.ZIndex = 21
+ themeTabs[theme] = tab
+ return tab
+end
+makeThemeTab("BLUE", "❄ NORMAL", 10/320, C.BLUE_DARK)
+makeThemeTab("HALLOWEEN", "🎃 HALLOWEEN", 10/320 + (themeTabWidth + 6)/320, C.ROW)
+makeThemeTab("CHRISTMAS", "🎄 CHRISTMAS", 10/320 + 2*(themeTabWidth + 6)/320, C.ROW)
 local backButton = button(settingsPanel, "BACK TO MAIN", UDim2.new(1,-20,0,30), UDim2.fromOffset(10,109), function()
  settingsPanel.Visible = false
 end, C.ROW)
@@ -534,9 +556,9 @@ task.spawn(function()
    local leaf = make("TextLabel", {
     BackgroundTransparency = 1, Size = UDim2.fromOffset(math.random(13,21), math.random(13,21)),
     Position = UDim2.new(math.random(2,98)/100, 0, 0, -24),
-    Text = currentTheme == "HALLOWEEN" and ({"🍂","🍁","🍃"})[math.random(1,3)] or ({"❄","❅","❆"})[math.random(1,3)],
+    Text = currentTheme == "HALLOWEEN" and ({"🍂","🍁","🍃"})[math.random(1,3)] or (currentTheme == "CHRISTMAS" and ({"🍬","🍭","🎄"})[math.random(1,3)] or ({"❄","❅","❆"})[math.random(1,3)]),
     TextSize = math.random(12,18), TextTransparency = 0.08,
-    Rotation = math.random(-35,35), TextColor3 = currentTheme == "HALLOWEEN" and Color3.fromRGB(255, 143, 45) or Color3.fromRGB(170, 225, 255),
+    Rotation = math.random(-35,35), TextColor3 = currentTheme == "HALLOWEEN" and Color3.fromRGB(255, 143, 45) or (currentTheme == "CHRISTMAS" and (math.random(1,2) == 1 and Color3.fromRGB(255, 65, 80) or Color3.fromRGB(70, 230, 125)) or Color3.fromRGB(170, 225, 255)),
     Font = Enum.Font.Gotham, BorderSizePixel = 0, Active = false,
     ZIndex = 51
    }, leafLayer)
@@ -555,11 +577,10 @@ local minimize = button(header, "—", UDim2.fromOffset(22,22), UDim2.new(1,-55,
 end, C.ROW)
 
 -- Apply the saved theme after the UI and minimized button exist.
-if prefs.theme == "HALLOWEEN" then
- applyTheme("HALLOWEEN")
- themeButton.Text = "Switch to Arctic Blue"
+if prefs.theme == "HALLOWEEN" or prefs.theme == "CHRISTMAS" then
+ applyTheme(prefs.theme)
 else
- themeButton.Text = "Switch to Halloween Orange"
+ applyTheme("BLUE")
 end
 if persistenceLabel then persistenceLabel.Text = persistenceState end
 
