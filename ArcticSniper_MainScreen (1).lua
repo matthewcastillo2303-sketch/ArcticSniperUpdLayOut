@@ -32,6 +32,8 @@ local HALLOWEEN_PALETTE = {
  HOVER = Color3.fromRGB(57, 34, 22), MUTED = Color3.fromRGB(190, 151, 122)
 }
 local currentTheme = "BLUE"
+local mini
+local leafLayer
 local prefs = {scan = false, scope = false, spam = false, hideUser = false, auto = 5, scale = 0.76}
 local currentCode = ""
 
@@ -80,6 +82,11 @@ local main = make("Frame", {
  BorderSizePixel = 0, Active = true, ClipsDescendants = true
 }, gui)
 corner(main, 13); outline(main, C.BORDER, 1.4)
+leafLayer = make("Frame", {
+ Name = "HalloweenLeaves", Size = UDim2.fromScale(1,1),
+ BackgroundTransparency = 1, BorderSizePixel = 0, ClipsDescendants = true,
+ Active = false, Visible = false, ZIndex = 50
+}, main)
 local uiScale = make("UIScale", {Scale = 1}, main)
 local function resize()
  local camera = workspace.CurrentCamera
@@ -288,6 +295,13 @@ local function applyTheme(theme)
  C.HOVER = newPalette.HOVER
  C.MUTED = newPalette.MUTED
  currentTheme = theme
+ if mini then
+  mini.Text = theme == "HALLOWEEN" and "🎃 AS" or "❄ AS"
+  mini.BackgroundColor3 = theme == "HALLOWEEN" and Color3.fromRGB(77, 35, 13) or C.PANEL
+  local miniStroke = mini:FindFirstChildOfClass("UIStroke")
+  if miniStroke then miniStroke.Color = newPalette.BLUE end
+ end
+ if leafLayer then leafLayer.Visible = theme == "HALLOWEEN" end
 end
 
 local themeButton
@@ -304,10 +318,71 @@ backButton.ZIndex = 21
 text(settingsPanel, "Halloween palette: orange accents and dark charcoal panels.", UDim2.new(1,-20,0,30), UDim2.fromOffset(10,148), 8, C.MUTED).ZIndex = 21
 
 -- Reopen button when minimized
-local mini = button(gui, "❄ AS", UDim2.fromOffset(66,32), UDim2.new(0,12,.5,-16), function()
- main.Visible = true; mini.Visible = false
+mini = button(gui, "❄ AS", UDim2.fromOffset(66,32), UDim2.new(0,12,.5,-16), function()
+ if not miniWasDragged then
+  main.Visible = true; mini.Visible = false
+ end
 end, C.PANEL)
 mini.Visible = false; outline(mini, C.BLUE)
+local miniWasDragged = false
+local miniDragging = false
+local miniDragInput
+local miniStartPointer
+local miniStartPos
+local miniDragType
+mini.InputBegan:Connect(function(input)
+ if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+  miniWasDragged = false
+  miniDragging = true
+  miniDragInput = input
+  miniStartPointer = input.Position
+  miniStartPos = mini.Position
+  miniDragType = input.UserInputType
+ end
+end)
+UIS.InputChanged:Connect(function(input)
+ if not miniDragging then return end
+ local moving = (miniDragType == Enum.UserInputType.MouseButton1 and input.UserInputType == Enum.UserInputType.MouseMovement)
+  or (miniDragType == Enum.UserInputType.Touch and input == miniDragInput)
+ if moving then
+  local delta = input.Position - miniStartPointer
+  if math.abs(delta.X) > 4 or math.abs(delta.Y) > 4 then miniWasDragged = true end
+  mini.Position = UDim2.new(miniStartPos.X.Scale, miniStartPos.X.Offset + delta.X, miniStartPos.Y.Scale, miniStartPos.Y.Offset + delta.Y)
+ end
+end)
+UIS.InputEnded:Connect(function(input)
+ if (miniDragType == Enum.UserInputType.MouseButton1 and input.UserInputType == Enum.UserInputType.MouseButton1)
+  or (miniDragType == Enum.UserInputType.Touch and input == miniDragInput) then
+  miniDragging = false
+  miniDragInput = nil
+  miniDragType = nil
+ end
+end)
+
+-- Halloween-only falling leaf animation. This is a visual effect inside the panel.
+task.spawn(function()
+ while gui.Parent do
+  task.wait(0.32)
+  if currentTheme == "HALLOWEEN" and leafLayer and leafLayer.Visible then
+   local leaf = make("TextLabel", {
+    BackgroundTransparency = 1, Size = UDim2.fromOffset(math.random(13,21), math.random(13,21)),
+    Position = UDim2.new(math.random(2,98)/100, 0, 0, -24),
+    Text = ({"🍂","🍁","🍃"})[math.random(1,3)],
+    TextSize = math.random(12,18), TextTransparency = 0.08,
+    Rotation = math.random(-35,35), TextColor3 = Color3.fromRGB(255, 143, 45),
+    Font = Enum.Font.Gotham, BorderSizePixel = 0, Active = false,
+    ZIndex = 51
+   }, leafLayer)
+   local duration = math.random(28,48)/10
+   local target = UDim2.new(math.clamp(leaf.Position.X.Scale + math.random(-12,12)/100, 0, 1), 0, 1, 22)
+   local tween = TweenService:Create(leaf, TweenInfo.new(duration, Enum.EasingStyle.Linear), {
+    Position = target, Rotation = leaf.Rotation + math.random(120,300), TextTransparency = 0.18
+   })
+   tween:Play()
+   tween.Completed:Connect(function() if leaf then leaf:Destroy() end end)
+  end
+ end
+end)
 local minimize = button(header, "—", UDim2.fromOffset(22,22), UDim2.new(1,-55,0,9), function()
  main.Visible = false; mini.Visible = true
 end, C.ROW)
