@@ -341,14 +341,14 @@ local bannerBody = make("TextLabel", {
  Position = UDim2.new(0.5, 0, 0, 64),
  Size = UDim2.new(0.9, 0, 0, 44),
  BackgroundTransparency = 1, BackgroundColor3 = Color3.new(1, 1, 1),
- BorderSizePixel = 0, BorderMode = Enum.BorderMode.Outline,
+ BorderSizePixel = 0, BorderMode = Enum.BorderMode.Middle,
  Text = "", TextColor3 = Color3.new(1, 1, 1),
  TextSize = 25, TextScaled = true, TextWrapped = true,
  Font = Enum.Font.GothamBold,
  TextXAlignment = Enum.TextXAlignment.Center,
  TextYAlignment = Enum.TextYAlignment.Center,
  TextStrokeColor3 = Color3.new(0, 0, 0),
- TextStrokeTransparency = 0,
+ TextStrokeTransparency = 1,
  Visible = false, ZIndex = 1000
 }, bannerGui)
 local testBanner = bannerBody
