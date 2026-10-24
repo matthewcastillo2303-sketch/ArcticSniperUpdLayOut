@@ -335,21 +335,34 @@ local bannerGui = make("ScreenGui", {
  IgnoreGuiInset = true, DisplayOrder = 10000,
  ZIndexBehavior = Enum.ZIndexBehavior.Global
 }, playerGui)
+-- Black text layer underneath gives the white announcement a visible outline.
+local bannerOutline = make("TextLabel", {
+ Name = "ArcticTestAnnouncementOutline",
+ AnchorPoint = Vector2.new(0.5, 0),
+ Position = UDim2.new(0.5, 0, 0, 64),
+ Size = UDim2.new(0.9, 0, 0, 44),
+ BackgroundTransparency = 1, BorderSizePixel = 0,
+ Text = "", TextColor3 = Color3.new(0, 0, 0),
+ TextSize = 25, TextScaled = true, TextWrapped = true,
+ Font = Enum.Font.GothamBold,
+ TextXAlignment = Enum.TextXAlignment.Center,
+ TextYAlignment = Enum.TextYAlignment.Center,
+ TextStrokeColor3 = Color3.new(0, 0, 0), TextStrokeTransparency = 0,
+ Visible = false, ZIndex = 1000
+}, bannerGui)
 local bannerBody = make("TextLabel", {
  Name = "ArcticTestAnnouncementText",
  AnchorPoint = Vector2.new(0.5, 0),
  Position = UDim2.new(0.5, 0, 0, 64),
  Size = UDim2.new(0.9, 0, 0, 44),
- BackgroundTransparency = 1, BackgroundColor3 = Color3.new(1, 1, 1),
- BorderSizePixel = 0, BorderMode = Enum.BorderMode.Middle,
+ BackgroundTransparency = 1, BorderSizePixel = 0,
  Text = "", TextColor3 = Color3.new(1, 1, 1),
  TextSize = 25, TextScaled = true, TextWrapped = true,
  Font = Enum.Font.GothamBold,
  TextXAlignment = Enum.TextXAlignment.Center,
  TextYAlignment = Enum.TextYAlignment.Center,
- TextStrokeColor3 = Color3.new(0, 0, 0),
- TextStrokeTransparency = 0,
- Visible = false, ZIndex = 1000
+ TextStrokeColor3 = Color3.new(0, 0, 0), TextStrokeTransparency = 0,
+ Visible = false, ZIndex = 1002
 }, bannerGui)
 local testBanner = bannerBody
 
@@ -390,6 +403,7 @@ local showTestButton = button(testerPanel, "SEND TEST BANNER", UDim2.new(.62,-13
  task.delay(5, function()
   if bannerToken == thisToken and testBanner and testBanner.Parent then
    testBanner.Visible = false
+    bannerOutline.Visible = false
   end
  end)
 end, C.BLUE_DARK)
@@ -399,6 +413,7 @@ local clearTestButton = button(testerPanel, "CLEAR", UDim2.new(.38,-7,0,32), UDi
  previewStatus.Text = "LOCAL TEST ONLY • NOT SENT TO ANYONE"
  previewStatus.TextColor3 = C.GREEN
  testBanner.Visible = false
+  bannerOutline.Visible = false
 end, C.ROW)
 clearTestButton.ZIndex = 21
 local testerBackButton = button(testerPanel, "BACK TO MAIN", UDim2.new(1,-20,0,26), UDim2.fromOffset(10,332), function()
