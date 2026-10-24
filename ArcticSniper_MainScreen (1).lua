@@ -326,6 +326,40 @@ end, C.BLUE_DARK)
 
 -- This scans text the user supplies; it does not read another game's private banner UI.
 
+-- Local-only top-of-screen announcement banner, similar to the example video.
+-- It is only a visual test on this player's screen; it never sends to a server.
+local bannerToken = 0
+local testBanner = make("Frame", {
+ Name = "ArcticTestAnnouncementBanner",
+ AnchorPoint = Vector2.new(0.5, 0),
+ Position = UDim2.new(0.5, 0, 0, 24),
+ Size = UDim2.new(0.78, 0, 0, 68),
+ BackgroundColor3 = C.PANEL, BorderSizePixel = 0,
+ Visible = false, ZIndex = 100
+}, gui)
+corner(testBanner, 10); outline(testBanner, C.BLUE, 1.5)
+local bannerAccent = make("Frame", {
+ Name = "Accent", Position = UDim2.fromOffset(0, 0),
+ Size = UDim2.new(0, 4, 1, 0), BackgroundColor3 = C.BLUE,
+ BorderSizePixel = 0, ZIndex = 101
+}, testBanner)
+corner(bannerAccent, 4)
+local bannerTitle = text(testBanner, "📢  ARCTIC SNIPER • TEST ANNOUNCEMENT",
+ UDim2.new(1, -52, 0, 23), UDim2.fromOffset(13, 5), 9, C.BLUE, false, Enum.Font.GothamBold)
+bannerTitle.ZIndex = 101
+local bannerBody = text(testBanner, "", UDim2.new(1, -48, 0, 32),
+ UDim2.fromOffset(13, 28), 12, C.WHITE, false, Enum.Font.GothamSemibold)
+bannerBody.TextYAlignment = Enum.TextYAlignment.Center
+bannerBody.ZIndex = 101
+local bannerClose = make("TextButton", {
+ Name = "CloseBanner", Size = UDim2.fromOffset(25, 25),
+ Position = UDim2.new(1, -31, 0, 5), BackgroundColor3 = C.ROW,
+ BorderSizePixel = 0, Text = "×", TextColor3 = C.WHITE,
+ TextSize = 18, Font = Enum.Font.GothamBold, ZIndex = 102
+}, testBanner)
+corner(bannerClose, 7)
+bannerClose.Activated:Connect(function() testBanner.Visible = false end)
+
 -- Local-only announcement tester. Nothing is sent to a server or other players.
 testerPanel = make("Frame", {
  Name = "AnnouncementTester", Position = UDim2.fromOffset(0,0), Size = UDim2.fromScale(1,1),
@@ -364,8 +398,17 @@ local showTestButton = button(testerPanel, "SHOW TEST", UDim2.new(.58,-13,0,30),
   return
  end
  announcementPreview.Text = message
- previewStatus.Text = "TEST DISPLAYED LOCALLY • NOT SENT"
+ bannerBody.Text = message
+ testBanner.Visible = true
+ bannerToken = bannerToken + 1
+ local thisToken = bannerToken
+ previewStatus.Text = "BANNER SHOWN LOCALLY • NOT SENT"
  previewStatus.TextColor3 = C.GREEN
+ task.delay(5, function()
+  if bannerToken == thisToken and testBanner and testBanner.Parent then
+   testBanner.Visible = false
+  end
+ end)
 end, C.BLUE_DARK)
 showTestButton.ZIndex = 21
 local clearTestButton = button(testerPanel, "CLEAR", UDim2.new(.42,-7,0,30), UDim2.new(.58,3,0,294), function()
