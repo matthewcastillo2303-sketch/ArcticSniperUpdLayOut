@@ -200,12 +200,19 @@ corner(rail, 9); outline(rail)
 text(rail, "ARCTIC", UDim2.new(1,0,0,18), UDim2.fromOffset(0,7), 7, C.MUTED, true, Enum.Font.GothamBold)
 local content
 local settingsPanel
+local testerPanel
 button(rail, "MAIN", UDim2.new(1,-8,0,28), UDim2.fromOffset(4,31), function()
  if content then content.Visible = true end
  if settingsPanel then settingsPanel.Visible = false end
+ if testerPanel then testerPanel.Visible = false end
 end, C.BLUE_DARK).TextSize = 7
-button(rail, "SETTINGS", UDim2.new(1,-8,0,28), UDim2.fromOffset(4,64), function()
+button(rail, "TESTER", UDim2.new(1,-8,0,28), UDim2.fromOffset(4,64), function()
+ if testerPanel then testerPanel.Visible = not testerPanel.Visible end
+ if settingsPanel then settingsPanel.Visible = false end
+end, C.ROW).TextSize = 6
+button(rail, "SETTINGS", UDim2.new(1,-8,0,28), UDim2.fromOffset(4,97), function()
  if settingsPanel then settingsPanel.Visible = not settingsPanel.Visible end
+ if testerPanel then testerPanel.Visible = false end
 end, C.ROW).TextSize = 6
 text(rail, "❄", UDim2.new(1,0,0,20), UDim2.new(0,0,1,-24), 12, C.BLUE, true)
 
@@ -318,6 +325,60 @@ button(bottom, "SCAN TEXT", UDim2.new(.32,0,1,0), UDim2.new(.68,4,0,0), function
 end, C.BLUE_DARK)
 
 -- This scans text the user supplies; it does not read another game's private banner UI.
+
+-- Local-only announcement tester. Nothing is sent to a server or other players.
+testerPanel = make("Frame", {
+ Name = "AnnouncementTester", Position = UDim2.fromOffset(0,0), Size = UDim2.fromScale(1,1),
+ BackgroundColor3 = C.BG, BorderSizePixel = 0, Visible = false, ZIndex = 20
+}, content)
+corner(testerPanel, 9); outline(testerPanel, C.BORDER, 1.2)
+text(testerPanel, "TEXT TESTER", UDim2.new(1,-20,0,26), UDim2.fromOffset(10,8), 12, C.WHITE, false, Enum.Font.GothamBold).ZIndex = 21
+text(testerPanel, "Preview a fake announcement on your screen only.", UDim2.new(1,-20,0,26), UDim2.fromOffset(10,34), 8, C.MUTED).ZIndex = 21
+local announcementInput = make("TextBox", {
+ Name = "AnnouncementInput", Size = UDim2.new(1,-20,0,70), Position = UDim2.fromOffset(10,66),
+ BackgroundColor3 = C.ROW, BorderSizePixel = 0, ClearTextOnFocus = false,
+ Text = "", PlaceholderText = "Type your test announcement here...",
+ TextColor3 = C.WHITE, PlaceholderColor3 = C.MUTED, TextSize = 10,
+ Font = Enum.Font.Gotham, TextXAlignment = Enum.TextXAlignment.Left,
+ TextYAlignment = Enum.TextYAlignment.Top, TextWrapped = true, MultiLine = true,
+ ZIndex = 21
+}, testerPanel)
+corner(announcementInput, 8); outline(announcementInput)
+local previewCard = make("Frame", {
+ Name = "AnnouncementPreview", Size = UDim2.new(1,-20,0,112), Position = UDim2.fromOffset(10,145),
+ BackgroundColor3 = C.PANEL, BorderSizePixel = 0, ZIndex = 21
+}, testerPanel)
+corner(previewCard, 8); outline(previewCard)
+text(previewCard, "📢  TEST ANNOUNCEMENT", UDim2.new(1,-16,0,24), UDim2.fromOffset(8,6), 9, C.BLUE, false, Enum.Font.GothamBold).ZIndex = 22
+local announcementPreview = text(previewCard, "Your test announcement will appear here.", UDim2.new(1,-16,1,-38), UDim2.fromOffset(8,31), 10, C.WHITE)
+announcementPreview.TextYAlignment = Enum.TextYAlignment.Top
+announcementPreview.ZIndex = 22
+local previewStatus = text(testerPanel, "LOCAL PREVIEW ONLY • NOT SENT TO ANYONE", UDim2.new(1,-20,0,22), UDim2.fromOffset(10,263), 7, C.GREEN, true)
+previewStatus.ZIndex = 21
+local showTestButton = button(testerPanel, "SHOW TEST", UDim2.new(.58,-13,0,30), UDim2.fromOffset(10,294), function()
+ local message = string.gsub(announcementInput.Text or "", "^%s*(.-)%s*$", "%1")
+ if message == "" then
+  announcementPreview.Text = "Type a message above first."
+  previewStatus.Text = "NOTHING TO PREVIEW"
+  previewStatus.TextColor3 = C.MUTED
+  return
+ end
+ announcementPreview.Text = message
+ previewStatus.Text = "TEST DISPLAYED LOCALLY • NOT SENT"
+ previewStatus.TextColor3 = C.GREEN
+end, C.BLUE_DARK)
+showTestButton.ZIndex = 21
+local clearTestButton = button(testerPanel, "CLEAR", UDim2.new(.42,-7,0,30), UDim2.new(.58,3,0,294), function()
+ announcementInput.Text = ""
+ announcementPreview.Text = "Your test announcement will appear here."
+ previewStatus.Text = "LOCAL PREVIEW ONLY • NOT SENT TO ANYONE"
+ previewStatus.TextColor3 = C.GREEN
+end, C.ROW)
+clearTestButton.ZIndex = 21
+local testerBackButton = button(testerPanel, "BACK TO MAIN", UDim2.new(1,-20,0,26), UDim2.fromOffset(10,332), function()
+ testerPanel.Visible = false
+end, C.ROW)
+testerBackButton.ZIndex = 21
 
 -- Settings panel: choose between standard blue and Halloween orange.
 settingsPanel = make("Frame", {
