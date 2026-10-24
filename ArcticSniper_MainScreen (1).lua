@@ -78,7 +78,7 @@ local gui = make("ScreenGui", {
 }, playerGui)
 local main = make("Frame", {
  Name = "Main", AnchorPoint = Vector2.new(.5,.5), Position = UDim2.fromScale(.5,.5),
- Size = UDim2.fromOffset(320, 520), BackgroundColor3 = C.BG,
+ Size = UDim2.fromOffset(320, 420), BackgroundColor3 = C.BG,
  BorderSizePixel = 0, Active = true, ClipsDescendants = true
 }, gui)
 corner(main, 13); outline(main, C.BORDER, 1.4)
@@ -92,7 +92,7 @@ local function resize()
  local camera = workspace.CurrentCamera
  if not camera then return end
  local v = camera.ViewportSize
- uiScale.Scale = math.clamp(math.min((v.X - 18)/320, (v.Y - 18)/520, prefs.scale), .55, 1)
+ uiScale.Scale = math.clamp(math.min((v.X - 18)/320, (v.Y - 18)/420, prefs.scale), .55, 1)
 end
 resize()
 if workspace.CurrentCamera then workspace.CurrentCamera:GetPropertyChangedSignal("ViewportSize"):Connect(resize) end
@@ -150,7 +150,7 @@ button(rail, "SETTINGS", UDim2.new(1,-8,0,28), UDim2.fromOffset(4,64), function(
 end, C.ROW).TextSize = 6
 text(rail, "❄", UDim2.new(1,0,0,20), UDim2.new(0,0,1,-24), 12, C.BLUE, true)
 
-content = make("ScrollingFrame", {Name = "MainContent", Position = UDim2.fromOffset(69,49), Size = UDim2.new(1,-77,1,-56), BackgroundTransparency = 1, BorderSizePixel = 0, ScrollBarThickness = 4, ScrollBarImageColor3 = C.BLUE, CanvasSize = UDim2.new(0,0,0,300), ScrollingDirection = Enum.ScrollingDirection.Y, Active = true}, main)
+content = make("ScrollingFrame", {Name = "MainContent", Position = UDim2.fromOffset(69,49), Size = UDim2.new(1,-77,1,-56), BackgroundTransparency = 1, BorderSizePixel = 0, ScrollBarThickness = 4, ScrollBarImageColor3 = C.BLUE, CanvasSize = UDim2.new(0,0,0,390), ScrollingDirection = Enum.ScrollingDirection.Y, Active = true}, main)
 
 -- Top row and sniped-code card
 local topRow = make("Frame", {Size = UDim2.new(1,0,0,18), BackgroundTransparency = 1}, content)
@@ -230,7 +230,7 @@ for i=1,5 do
 end
 
 -- Bottom action buttons
-local bottom = make("Frame", {Position = UDim2.fromOffset(0,264), Size = UDim2.new(1,0,0,25), BackgroundTransparency = 1}, content)
+local bottom = make("Frame", {Position = UDim2.fromOffset(0,330), Size = UDim2.new(1,0,0,25), BackgroundTransparency = 1}, content)
 local fragmentBox = make("TextBox", {
  Size = UDim2.new(.68,-4,1,0), Position = UDim2.new(0,0,0,0),
  BackgroundColor3 = C.ROW, BorderSizePixel = 0, ClearTextOnFocus = false,
