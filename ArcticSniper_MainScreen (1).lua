@@ -484,9 +484,8 @@ local function applyTheme(theme)
 end
 
 local themeTabs = {}
-local themeTabWidth = (1 - 20 - 12) / 3
-local function makeThemeTab(theme, label, xScale, paletteColor)
- local tab = button(settingsPanel, label, UDim2.new(themeTabWidth, 0, 0, 38), UDim2.new(xScale, 0, 0, 66), function()
+local function makeThemeTab(theme, label, xScale, xOffset, paletteColor)
+ local tab = button(settingsPanel, label, UDim2.new(1/3, -12, 0, 38), UDim2.new(xScale, xOffset, 0, 66), function()
   applyTheme(theme)
  end, paletteColor)
  tab.Name = theme
@@ -495,9 +494,9 @@ local function makeThemeTab(theme, label, xScale, paletteColor)
  themeTabs[theme] = tab
  return tab
 end
-makeThemeTab("BLUE", "❄ NORMAL", 10/320, C.BLUE_DARK)
-makeThemeTab("HALLOWEEN", "🎃 HALLOWEEN", 10/320 + (themeTabWidth + 6)/320, C.ROW)
-makeThemeTab("CHRISTMAS", "🎄 CHRISTMAS", 10/320 + 2*(themeTabWidth + 6)/320, C.ROW)
+makeThemeTab("BLUE", "❄ NORMAL", 0, 10, C.BLUE_DARK)
+makeThemeTab("HALLOWEEN", "🎃 HALLOWEEN", 1/3, 4, C.ROW)
+makeThemeTab("CHRISTMAS", "🎄 CHRISTMAS", 2/3, -2, C.ROW)
 local backButton = button(settingsPanel, "BACK TO MAIN", UDim2.new(1,-20,0,30), UDim2.fromOffset(10,109), function()
  settingsPanel.Visible = false
 end, C.ROW)
