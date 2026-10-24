@@ -318,13 +318,13 @@ backButton.ZIndex = 21
 text(settingsPanel, "Halloween palette: orange accents and dark charcoal panels.", UDim2.new(1,-20,0,30), UDim2.fromOffset(10,148), 8, C.MUTED).ZIndex = 21
 
 -- Reopen button when minimized
+local miniWasDragged = false
 mini = button(gui, "❄ AS", UDim2.fromOffset(66,32), UDim2.new(0,12,.5,-16), function()
  if not miniWasDragged then
   main.Visible = true; mini.Visible = false
  end
 end, C.PANEL)
 mini.Visible = false; outline(mini, C.BLUE)
-local miniWasDragged = false
 local miniDragging = false
 local miniDragInput
 local miniStartPointer
