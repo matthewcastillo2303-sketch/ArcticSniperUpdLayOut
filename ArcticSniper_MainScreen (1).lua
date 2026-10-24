@@ -32,7 +32,7 @@ local HALLOWEEN_PALETTE = {
  HOVER = Color3.fromRGB(57, 34, 22), MUTED = Color3.fromRGB(190, 151, 122)
 }
 local currentTheme = "BLUE"
-local prefs = {scan = false, scope = false, spam = false, hideUser = false, auto = 5, scale = 0.92}
+local prefs = {scan = false, scope = false, spam = false, hideUser = false, auto = 5, scale = 0.76}
 local currentCode = ""
 
 local function make(className, props, parent)
