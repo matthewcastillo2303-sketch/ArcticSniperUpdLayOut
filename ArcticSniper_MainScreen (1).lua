@@ -379,6 +379,8 @@ local backButton = button(settingsPanel, "BACK TO MAIN", UDim2.new(1,-20,0,30), 
 end, C.ROW)
 backButton.ZIndex = 21
 text(settingsPanel, "Halloween palette: orange accents and dark charcoal panels.", UDim2.new(1,-20,0,30), UDim2.fromOffset(10,148), 8, C.MUTED).ZIndex = 21
+persistenceLabel = text(settingsPanel, persistenceState, UDim2.new(1,-20,0,24), UDim2.fromOffset(10,184), 7, C.MUTED)
+persistenceLabel.ZIndex = 21
 
 -- Reopen button when minimized
 local miniWasDragged = false
