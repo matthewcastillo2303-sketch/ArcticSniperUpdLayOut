@@ -348,7 +348,7 @@ local bannerBody = make("TextLabel", {
  TextXAlignment = Enum.TextXAlignment.Center,
  TextYAlignment = Enum.TextYAlignment.Center,
  TextStrokeColor3 = Color3.new(0, 0, 0),
- TextStrokeTransparency = 1,
+ TextStrokeTransparency = 0,
  Visible = false, ZIndex = 1000
 }, bannerGui)
 local testBanner = bannerBody
