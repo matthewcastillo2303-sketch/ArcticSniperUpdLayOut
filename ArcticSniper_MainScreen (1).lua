@@ -153,7 +153,17 @@ text(topRow, "AUTO SUBMIT "..prefs.auto, UDim2.new(.35,0,1,0), UDim2.new(.65,0,0
 local codeCard = make("Frame", {Position = UDim2.fromOffset(0,22), Size = UDim2.new(1,0,0,69), BackgroundColor3 = C.PANEL, BorderSizePixel = 0}, content)
 corner(codeCard, 9); outline(codeCard)
 text(codeCard, "SNIPED CODE", UDim2.new(1,-90,0,13), UDim2.fromOffset(9,5), 7, C.BLUE, false, Enum.Font.GothamBold)
-local codeLabel = text(codeCard, "waiting...", UDim2.new(1,-100,0,24), UDim2.fromOffset(9,20), 16, C.WHITE, false, Enum.Font.GothamBold)
+local codeLabel = make("TextBox", {
+ Size = UDim2.new(1,-100,0,24), Position = UDim2.fromOffset(9,20),
+ BackgroundTransparency = 1, BorderSizePixel = 0, ClearTextOnFocus = false,
+ Text = "waiting...", TextColor3 = C.WHITE, TextSize = 16,
+ Font = Enum.Font.GothamBold, TextXAlignment = Enum.TextXAlignment.Left,
+ TextYAlignment = Enum.TextYAlignment.Center, TextWrapped = false,
+ PlaceholderText = "Type or edit code here", PlaceholderColor3 = C.MUTED,
+}, codeCard)
+codeLabel.FocusLost:Connect(function()
+ currentCode = codeLabel.Text
+end)
 local codeHint = text(codeCard, "Local preview • no live game connection", UDim2.new(1,-100,0,13), UDim2.fromOffset(9,45), 7, C.MUTED)
 button(codeCard, "RESET", UDim2.fromOffset(52,21), UDim2.new(1,-61,0,8), function()
  currentCode = ""; codeLabel.Text = "waiting..."; codeHint.Text = "Local preview • reset"; codeHint.TextColor3 = C.MUTED
