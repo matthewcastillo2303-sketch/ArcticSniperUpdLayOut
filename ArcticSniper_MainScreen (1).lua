@@ -37,7 +37,12 @@ local CHRISTMAS_PALETTE = {
  BORDER = Color3.fromRGB(35, 130, 75), ROW = Color3.fromRGB(24, 47, 37),
  HOVER = Color3.fromRGB(35, 68, 48), MUTED = Color3.fromRGB(155, 205, 170)
 }
-local THEME_PALETTES = {BLUE = BLUE_PALETTE, HALLOWEEN = HALLOWEEN_PALETTE, CHRISTMAS = CHRISTMAS_PALETTE}
+local THANKSGIVING_PALETTE = {
+ BLUE = Color3.fromRGB(220, 112, 38), BLUE_DARK = Color3.fromRGB(111, 57, 25),
+ BORDER = Color3.fromRGB(168, 104, 39), ROW = Color3.fromRGB(43, 31, 24),
+ HOVER = Color3.fromRGB(64, 43, 29), MUTED = Color3.fromRGB(205, 164, 120)
+}
+local THEME_PALETTES = {BLUE = BLUE_PALETTE, HALLOWEEN = HALLOWEEN_PALETTE, CHRISTMAS = CHRISTMAS_PALETTE, THANKSGIVING = THANKSGIVING_PALETTE}
 local currentTheme = "BLUE"
 local mini
 local leafLayer
@@ -69,7 +74,7 @@ local function loadSettings()
  end
  if type(data.auto) == "number" then prefs.auto = math.clamp(math.floor(data.auto), 1, 5) end
  if type(data.scale) == "number" then prefs.scale = math.clamp(data.scale, 0.55, 1) end
- if data.theme == "BLUE" or data.theme == "HALLOWEEN" or data.theme == "CHRISTMAS" then prefs.theme = data.theme end
+ if data.theme == "BLUE" or data.theme == "HALLOWEEN" or data.theme == "CHRISTMAS" or data.theme == "THANKSGIVING" then prefs.theme = data.theme end
  persistenceState = "SETTINGS LOADED"
 end
 local function saveSettings()
@@ -468,8 +473,8 @@ local function applyTheme(theme)
  prefs.theme = theme
  saveSettings()
  if mini then
-  mini.Text = theme == "HALLOWEEN" and "🎃 AS" or (theme == "CHRISTMAS" and "🎄 AS" or "❄ AS")
-  mini.BackgroundColor3 = theme == "HALLOWEEN" and Color3.fromRGB(77, 35, 13) or (theme == "CHRISTMAS" and Color3.fromRGB(105, 22, 36) or C.PANEL)
+  mini.Text = theme == "HALLOWEEN" and "🎃 AS" or (theme == "CHRISTMAS" and "🎄 AS" or (theme == "THANKSGIVING" and "🦃 AS" or "❄ AS"))
+  mini.BackgroundColor3 = theme == "HALLOWEEN" and Color3.fromRGB(77, 35, 13) or (theme == "CHRISTMAS" and Color3.fromRGB(105, 22, 36) or (theme == "THANKSGIVING" and Color3.fromRGB(75, 39, 20) or C.PANEL))
   local miniStroke = mini:FindFirstChildOfClass("UIStroke")
   if miniStroke then miniStroke.Color = newPalette.BLUE end
  end
@@ -485,7 +490,7 @@ end
 
 local themeTabs = {}
 local function makeThemeTab(theme, label, xScale, xOffset, paletteColor)
- local tab = button(settingsPanel, label, UDim2.new(1/3, -12, 0, 38), UDim2.new(xScale, xOffset, 0, 66), function()
+ local tab = button(settingsPanel, label, UDim2.new(1/4, -8, 0, 38), UDim2.new(xScale, xOffset, 0, 66), function()
   applyTheme(theme)
  end, paletteColor)
  tab.Name = theme
@@ -494,14 +499,15 @@ local function makeThemeTab(theme, label, xScale, xOffset, paletteColor)
  themeTabs[theme] = tab
  return tab
 end
-makeThemeTab("BLUE", "❄ NORMAL", 0, 10, C.BLUE_DARK)
-makeThemeTab("HALLOWEEN", "🎃 HALLOWEEN", 1/3, 4, C.ROW)
-makeThemeTab("CHRISTMAS", "🎄 CHRISTMAS", 2/3, -2, C.ROW)
+makeThemeTab("BLUE", "❄ NORMAL", 0, 8, C.BLUE_DARK)
+makeThemeTab("HALLOWEEN", "🎃 HALLOWEEN", 1/4, 4, C.ROW)
+makeThemeTab("CHRISTMAS", "🎄 XMAS", 1/2, 0, C.ROW)
+makeThemeTab("THANKSGIVING", "🦃 THANKS", 3/4, -4, C.ROW)
 local backButton = button(settingsPanel, "BACK TO MAIN", UDim2.new(1,-20,0,30), UDim2.fromOffset(10,109), function()
  settingsPanel.Visible = false
 end, C.ROW)
 backButton.ZIndex = 21
-text(settingsPanel, "Halloween palette: orange accents and dark charcoal panels.", UDim2.new(1,-20,0,30), UDim2.fromOffset(10,148), 8, C.MUTED).ZIndex = 21
+text(settingsPanel, "Pick a seasonal look: Thanksgiving brings harvest colors and falling leaves.", UDim2.new(1,-20,0,30), UDim2.fromOffset(10,148), 8, C.MUTED).ZIndex = 21
 persistenceLabel = text(settingsPanel, persistenceState, UDim2.new(1,-20,0,24), UDim2.fromOffset(10,184), 7, C.MUTED)
 persistenceLabel.ZIndex = 21
 
@@ -547,7 +553,7 @@ UIS.InputEnded:Connect(function(input)
  end
 end)
 
--- Theme particles: falling snow in Arctic Blue and leaves in Halloween mode.
+-- Theme particles: snow, Halloween leaves, Christmas candy, or Thanksgiving leaves.
 task.spawn(function()
  while gui.Parent do
   task.wait(0.32)
@@ -555,9 +561,9 @@ task.spawn(function()
    local leaf = make("TextLabel", {
     BackgroundTransparency = 1, Size = UDim2.fromOffset(math.random(13,21), math.random(13,21)),
     Position = UDim2.new(math.random(2,98)/100, 0, 0, -24),
-    Text = currentTheme == "HALLOWEEN" and ({"🍂","🍁","🍃"})[math.random(1,3)] or (currentTheme == "CHRISTMAS" and ({"🍬","🍭","🎄"})[math.random(1,3)] or ({"❄","❅","❆"})[math.random(1,3)]),
+    Text = (currentTheme == "HALLOWEEN" or currentTheme == "THANKSGIVING") and ({"🍂","🍁","🍃"})[math.random(1,3)] or (currentTheme == "CHRISTMAS" and ({"🍬","🍭","🎄"})[math.random(1,3)] or ({"❄","❅","❆"})[math.random(1,3)]),
     TextSize = math.random(12,18), TextTransparency = 0.08,
-    Rotation = math.random(-35,35), TextColor3 = currentTheme == "HALLOWEEN" and Color3.fromRGB(255, 143, 45) or (currentTheme == "CHRISTMAS" and (math.random(1,2) == 1 and Color3.fromRGB(255, 65, 80) or Color3.fromRGB(70, 230, 125)) or Color3.fromRGB(170, 225, 255)),
+    Rotation = math.random(-35,35), TextColor3 = currentTheme == "HALLOWEEN" and Color3.fromRGB(255, 143, 45) or (currentTheme == "THANKSGIVING" and ({Color3.fromRGB(230, 105, 35), Color3.fromRGB(205, 55, 38), Color3.fromRGB(235, 183, 57)})[math.random(1,3)] or (currentTheme == "CHRISTMAS" and (math.random(1,2) == 1 and Color3.fromRGB(255, 65, 80) or Color3.fromRGB(70, 230, 125)) or Color3.fromRGB(170, 225, 255))),
     Font = Enum.Font.Gotham, BorderSizePixel = 0, Active = false,
     ZIndex = 51
    }, leafLayer)
