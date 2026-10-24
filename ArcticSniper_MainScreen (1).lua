@@ -34,7 +34,7 @@ local HALLOWEEN_PALETTE = {
 local currentTheme = "BLUE"
 local mini
 local leafLayer
-local prefs = {scan = false, scope = false, spam = false, hideUser = false, auto = 5, scale = 0.85}
+local prefs = {scan = false, scope = false, spam = false, hideUser = false, auto = 5, scale = 0.65}
 local currentCode = ""
 
 local function make(className, props, parent)
