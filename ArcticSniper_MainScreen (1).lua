@@ -133,7 +133,7 @@ end
 
 local gui = make("ScreenGui", {
  Name = "ArcticSniperMain", ResetOnSpawn = false, IgnoreGuiInset = true,
- DisplayOrder = 999, ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+ DisplayOrder = 9999, ZIndexBehavior = Enum.ZIndexBehavior.Global
 }, playerGui)
 local main = make("Frame", {
  Name = "Main", AnchorPoint = Vector2.new(.5,.5), Position = UDim2.fromScale(.5,.5),
@@ -332,10 +332,10 @@ local bannerToken = 0
 local testBanner = make("Frame", {
  Name = "ArcticTestAnnouncementBanner",
  AnchorPoint = Vector2.new(0.5, 0),
- Position = UDim2.new(0.5, 0, 0, 24),
- Size = UDim2.new(0.78, 0, 0, 68),
+ Position = UDim2.new(0.5, 0, 0, 70),
+ Size = UDim2.new(0.82, 0, 0, 76),
  BackgroundColor3 = C.PANEL, BorderSizePixel = 0,
- Visible = false, ZIndex = 100
+ Visible = false, ZIndex = 1000
 }, gui)
 corner(testBanner, 10); outline(testBanner, C.BLUE, 1.5)
 local bannerAccent = make("Frame", {
@@ -346,16 +346,16 @@ local bannerAccent = make("Frame", {
 corner(bannerAccent, 4)
 local bannerTitle = text(testBanner, "📢  ARCTIC SNIPER • TEST ANNOUNCEMENT",
  UDim2.new(1, -52, 0, 23), UDim2.fromOffset(13, 5), 9, C.BLUE, false, Enum.Font.GothamBold)
-bannerTitle.ZIndex = 101
+bannerTitle.ZIndex = 1001
 local bannerBody = text(testBanner, "", UDim2.new(1, -48, 0, 32),
  UDim2.fromOffset(13, 28), 12, C.WHITE, false, Enum.Font.GothamSemibold)
 bannerBody.TextYAlignment = Enum.TextYAlignment.Center
-bannerBody.ZIndex = 101
+bannerBody.ZIndex = 1001
 local bannerClose = make("TextButton", {
  Name = "CloseBanner", Size = UDim2.fromOffset(25, 25),
  Position = UDim2.new(1, -31, 0, 5), BackgroundColor3 = C.ROW,
  BorderSizePixel = 0, Text = "×", TextColor3 = C.WHITE,
- TextSize = 18, Font = Enum.Font.GothamBold, ZIndex = 102
+ TextSize = 18, Font = Enum.Font.GothamBold, ZIndex = 1002
 }, testBanner)
 corner(bannerClose, 7)
 bannerClose.Activated:Connect(function() testBanner.Visible = false end)
