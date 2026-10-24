@@ -326,8 +326,7 @@ end, C.BLUE_DARK)
 
 -- This scans text the user supplies; it does not read another game's private banner UI.
 
--- Local-only floating banner styled after the reference: no card, just an icon and outlined text.
--- This remains a visual test on this player's screen only.
+-- Local-only text announcement: no background frame, just bold white text with black outline.
 local bannerToken = 0
 local oldBannerGui = playerGui:FindFirstChild("ArcticSniperTestBanner")
 if oldBannerGui then oldBannerGui:Destroy() end
@@ -340,21 +339,17 @@ local testBanner = make("Frame", {
  Name = "ArcticTestAnnouncementBanner",
  AnchorPoint = Vector2.new(0.5, 0),
  Position = UDim2.new(0.5, 0, 0, 64),
- Size = UDim2.new(0.9, 0, 0, 46),
+ Size = UDim2.new(0.9, 0, 0, 44),
  BackgroundTransparency = 1, BorderSizePixel = 0,
  Visible = false, ZIndex = 1000
 }, bannerGui)
-local bannerIcon = text(testBanner, "📣", UDim2.fromOffset(38, 42),
- UDim2.fromOffset(0, 0), 28, C.WHITE, true, Enum.Font.GothamBold)
-bannerIcon.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
-bannerIcon.TextStrokeTransparency = 0
-bannerIcon.ZIndex = 1001
-local bannerBody = text(testBanner, "", UDim2.new(1, -42, 1, 0),
- UDim2.fromOffset(40, 0), 25, C.WHITE, false, Enum.Font.GothamBold)
+local bannerBody = text(testBanner, "", UDim2.new(1, 0, 1, 0),
+ UDim2.fromOffset(0, 0), 25, Color3.new(1, 1, 1), true, Enum.Font.GothamBold)
 bannerBody.TextYAlignment = Enum.TextYAlignment.Center
-bannerBody.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
-bannerBody.TextStrokeTransparency = 0
+bannerBody.TextXAlignment = Enum.TextXAlignment.Center
 bannerBody.TextScaled = true
+bannerBody.TextStrokeColor3 = Color3.new(0, 0, 0)
+bannerBody.TextStrokeTransparency = 0
 bannerBody.ZIndex = 1001
 
 -- Local-only announcement tester. Nothing is sent to a server or other players.
