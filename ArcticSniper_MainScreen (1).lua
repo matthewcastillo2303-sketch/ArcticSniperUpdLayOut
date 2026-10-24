@@ -329,6 +329,14 @@ end, C.BLUE_DARK)
 -- Local-only top-of-screen announcement banner, similar to the example video.
 -- It is only a visual test on this player's screen; it never sends to a server.
 local bannerToken = 0
+local oldBannerGui = playerGui:FindFirstChild("ArcticSniperTestBanner")
+if oldBannerGui then oldBannerGui:Destroy() end
+-- Separate ScreenGui guarantees the banner is outside the Arctic Sniper panel.
+local bannerGui = make("ScreenGui", {
+ Name = "ArcticSniperTestBanner", ResetOnSpawn = false,
+ IgnoreGuiInset = true, DisplayOrder = 10000,
+ ZIndexBehavior = Enum.ZIndexBehavior.Global
+}, playerGui)
 local testBanner = make("Frame", {
  Name = "ArcticTestAnnouncementBanner",
  AnchorPoint = Vector2.new(0.5, 0),
@@ -336,7 +344,7 @@ local testBanner = make("Frame", {
  Size = UDim2.new(0.82, 0, 0, 76),
  BackgroundColor3 = C.PANEL, BorderSizePixel = 0,
  Visible = false, ZIndex = 1000
-}, gui)
+}, bannerGui)
 corner(testBanner, 10); outline(testBanner, C.BLUE, 1.5)
 local bannerAccent = make("Frame", {
  Name = "Accent", Position = UDim2.fromOffset(0, 0),
