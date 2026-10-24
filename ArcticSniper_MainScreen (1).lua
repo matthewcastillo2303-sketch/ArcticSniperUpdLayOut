@@ -38,28 +38,60 @@ local leafLayer
 local SETTINGS_FILE = "ArcticSniper_Settings.json"
 local prefs = {scan = false, scope = false, spam = false, hideUser = false, auto = 5, scale = 0.85, theme = "BLUE"}
 
--- Save/load is supported only in executors that provide readfile/writefile.
+-- Persistence depends on executor-provided file APIs.
+local persistenceLabel
+local persistenceState = "File saving unavailable"
 local function loadSettings()
- if type(readfile) ~= "function" or type(writefile) ~= "function" then return end
+ if type(readfile) ~= "function" or type(writefile) ~= "function" then
+  persistenceState = "SAVE UNSUPPORTED"
+  warn("[Arctic Sniper] Settings won't persist: this executor needs readfile and writefile.")
+  return
+ end
  local ok, raw = pcall(readfile, SETTINGS_FILE)
- if not ok or type(raw) ~= "string" then return end
+ if not ok or type(raw) ~= "string" then
+  persistenceState = "SAVE READY"
+  return -- First run or file not present yet; don't overwrite anything until a setting changes.
+ end
  local decodedOk, data = pcall(function() return HttpService:JSONDecode(raw) end)
- if not decodedOk or type(data) ~= "table" then return end
+ if not decodedOk or type(data) ~= "table" then
+  persistenceState = "SAVE ERROR"
+  warn("[Arctic Sniper] Couldn't read settings file: invalid JSON.")
+  return
+ end
  for _, key in ipairs({"scan", "scope", "spam", "hideUser"}) do
   if type(data[key]) == "boolean" then prefs[key] = data[key] end
  end
  if type(data.auto) == "number" then prefs.auto = math.clamp(math.floor(data.auto), 1, 5) end
  if type(data.scale) == "number" then prefs.scale = math.clamp(data.scale, 0.55, 1) end
  if data.theme == "BLUE" or data.theme == "HALLOWEEN" then prefs.theme = data.theme end
+ persistenceState = "SETTINGS LOADED"
 end
 local function saveSettings()
- if type(writefile) ~= "function" then return end
+ if type(writefile) ~= "function" then
+  persistenceState = "SAVE UNSUPPORTED"
+  if persistenceLabel then persistenceLabel.Text = persistenceState end
+  return false
+ end
  local data = {
   scan = prefs.scan, scope = prefs.scope, spam = prefs.spam, hideUser = prefs.hideUser,
   auto = prefs.auto, scale = prefs.scale, theme = prefs.theme
  }
  local ok, encoded = pcall(function() return HttpService:JSONEncode(data) end)
- if ok then pcall(writefile, SETTINGS_FILE, encoded) end
+ if not ok then
+  persistenceState = "SAVE ERROR"
+  warn("[Arctic Sniper] Couldn't encode settings.")
+  if persistenceLabel then persistenceLabel.Text = persistenceState end
+  return false
+ end
+ local writeOk, writeErr = pcall(writefile, SETTINGS_FILE, encoded)
+ if writeOk then
+  persistenceState = "SETTINGS SAVED"
+ else
+  persistenceState = "SAVE ERROR"
+  warn("[Arctic Sniper] Writing settings failed: " .. tostring(writeErr))
+ end
+ if persistenceLabel then persistenceLabel.Text = persistenceState end
+ return writeOk
 end
 loadSettings()
 local currentCode = ""
@@ -133,7 +165,7 @@ text(header, "ARCTIC SNIPER", UDim2.new(0,170,0,18), UDim2.fromOffset(44,5), 11,
 text(header, "FROST EDITION", UDim2.new(0,140,0,13), UDim2.fromOffset(45,22), 7, C.MUTED)
 local statusDot = make("Frame", {Size = UDim2.fromOffset(6,6), Position = UDim2.new(1,-105,0,13), BackgroundColor3 = C.GREEN, BorderSizePixel = 0}, header)
 corner(statusDot, 5)
-text(header, "LOCAL DEMO", UDim2.fromOffset(64,15), UDim2.new(1,-94,0,9), 7, C.MUTED)
+persistenceLabel = text(header, persistenceState, UDim2.fromOffset(82,15), UDim2.new(1,-112,0,9), 6, C.MUTED)
 local closeButton = button(header, "×", UDim2.fromOffset(23,23), UDim2.new(1,-29,0,9), function() gui:Destroy() end, C.BLUE_DARK)
 closeButton.TextSize = 16
 
@@ -425,6 +457,6 @@ if prefs.theme == "HALLOWEEN" then
 else
  themeButton.Text = "Switch to Halloween Orange"
 end
-saveSettings()
+if persistenceLabel then persistenceLabel.Text = persistenceState end
 
 print("Arctic Sniper Main Screen loaded (local UI demo)")
