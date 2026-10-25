@@ -52,7 +52,7 @@ local currentTheme = "BLUE"
 local mini
 local leafLayer
 local SETTINGS_FILE = "ArcticSniper_Settings.json"
-local SCRIPT_VERSION = "1.0.0"
+local SCRIPT_VERSION = "1.1.0"
 local VERSION_URL = "https://raw.githubusercontent.com/matthewcastillo2303-sketch/ArcticSniperUpdLayOut/refs/heads/main/ArcticSniper_Version.txt"
 local prefs = {scan = false, scope = false, spam = false, hideUser = false, auto = 5, scale = 0.85, theme = "BLUE"}
 
