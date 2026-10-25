@@ -42,7 +42,12 @@ local THANKSGIVING_PALETTE = {
  BORDER = Color3.fromRGB(168, 104, 39), ROW = Color3.fromRGB(43, 31, 24),
  HOVER = Color3.fromRGB(64, 43, 29), MUTED = Color3.fromRGB(205, 164, 120)
 }
-local THEME_PALETTES = {BLUE = BLUE_PALETTE, HALLOWEEN = HALLOWEEN_PALETTE, CHRISTMAS = CHRISTMAS_PALETTE, THANKSGIVING = THANKSGIVING_PALETTE}
+local TACO_PALETTE = {
+ BLUE = Color3.fromRGB(237, 174, 54), BLUE_DARK = Color3.fromRGB(139, 76, 28),
+ BORDER = Color3.fromRGB(181, 111, 42), ROW = Color3.fromRGB(48, 37, 22),
+ HOVER = Color3.fromRGB(72, 53, 27), MUTED = Color3.fromRGB(216, 185, 125)
+}
+local THEME_PALETTES = {BLUE = BLUE_PALETTE, HALLOWEEN = HALLOWEEN_PALETTE, CHRISTMAS = CHRISTMAS_PALETTE, THANKSGIVING = THANKSGIVING_PALETTE, TACO = TACO_PALETTE}
 local currentTheme = "BLUE"
 local mini
 local leafLayer
@@ -76,7 +81,7 @@ local function loadSettings()
  end
  if type(data.auto) == "number" then prefs.auto = math.clamp(math.floor(data.auto), 1, 5) end
  if type(data.scale) == "number" then prefs.scale = math.clamp(data.scale, 0.55, 1) end
- if data.theme == "BLUE" or data.theme == "HALLOWEEN" or data.theme == "CHRISTMAS" or data.theme == "THANKSGIVING" then prefs.theme = data.theme end
+ if data.theme == "BLUE" or data.theme == "HALLOWEEN" or data.theme == "CHRISTMAS" or data.theme == "THANKSGIVING" or data.theme == "TACO" then prefs.theme = data.theme end
  persistenceState = "SETTINGS LOADED"
 end
 local function saveSettings()
@@ -475,8 +480,8 @@ local function applyTheme(theme)
  prefs.theme = theme
  saveSettings()
  if mini then
-  mini.Text = theme == "HALLOWEEN" and "🎃 AS" or (theme == "CHRISTMAS" and "🎄 AS" or (theme == "THANKSGIVING" and "🦃 AS" or "❄ AS"))
-  mini.BackgroundColor3 = theme == "HALLOWEEN" and Color3.fromRGB(77, 35, 13) or (theme == "CHRISTMAS" and Color3.fromRGB(105, 22, 36) or (theme == "THANKSGIVING" and Color3.fromRGB(75, 39, 20) or C.PANEL))
+  mini.Text = theme == "HALLOWEEN" and "🎃 AS" or (theme == "CHRISTMAS" and "🎄 AS" or (theme == "THANKSGIVING" and "🦃 AS" or (theme == "TACO" and "🌮 AS" or "❄ AS")))
+  mini.BackgroundColor3 = theme == "HALLOWEEN" and Color3.fromRGB(77, 35, 13) or (theme == "CHRISTMAS" and Color3.fromRGB(105, 22, 36) or (theme == "THANKSGIVING" and Color3.fromRGB(75, 39, 20) or (theme == "TACO" and Color3.fromRGB(92, 57, 24) or C.PANEL)))
   local miniStroke = mini:FindFirstChildOfClass("UIStroke")
   if miniStroke then miniStroke.Color = newPalette.BLUE end
  end
@@ -506,12 +511,14 @@ makeThemeTab("BLUE", "❄ NORMAL", 0, 66, C.BLUE_DARK)
 makeThemeTab("HALLOWEEN", "🎃 HALLOWEEN", 1/2, 66, C.ROW)
 makeThemeTab("CHRISTMAS", "🎄 CHRISTMAS", 0, 106, C.ROW)
 makeThemeTab("THANKSGIVING", "🦃 THANKSGIVING", 1/2, 106, C.ROW)
-local backButton = button(settingsPanel, "BACK TO MAIN", UDim2.new(1,-20,0,30), UDim2.fromOffset(10,148), function()
+text(settingsPanel, "ADMIN ABUSE THEMES", UDim2.new(1,-20,0,20), UDim2.fromOffset(10,148), 9, C.BLUE, false, Enum.Font.GothamBold).ZIndex = 21
+makeThemeTab("TACO", "🌮 TACO RAIN", 0, 170, C.ROW)
+local backButton = button(settingsPanel, "BACK TO MAIN", UDim2.new(1,-20,0,30), UDim2.fromOffset(10,208), function()
  settingsPanel.Visible = false
 end, C.ROW)
 backButton.ZIndex = 21
-text(settingsPanel, "Thanksgiving: harvest colors and falling autumn leaves.", UDim2.new(1,-20,0,24), UDim2.fromOffset(10,183), 7, C.MUTED).ZIndex = 21
-local versionStatus = text(settingsPanel, "VERSION "..SCRIPT_VERSION.." • NOT CHECKED", UDim2.new(1,-20,0,22), UDim2.fromOffset(10,210), 8, C.MUTED)
+text(settingsPanel, "Taco theme: warm tortilla gold, salsa red, and raining tacos.", UDim2.new(1,-20,0,24), UDim2.fromOffset(10,243), 7, C.MUTED).ZIndex = 21
+local versionStatus = text(settingsPanel, "VERSION "..SCRIPT_VERSION.." • NOT CHECKED", UDim2.new(1,-20,0,22), UDim2.fromOffset(10,267), 8, C.MUTED)
 versionStatus.ZIndex = 21
 local function checkForUpdates()
  versionStatus.Text = "CHECKING FOR UPDATES..."
@@ -538,9 +545,9 @@ local function checkForUpdates()
   end
  end)
 end
-local updateButton = button(settingsPanel, "CHECK FOR UPDATES", UDim2.new(1,-20,0,30), UDim2.fromOffset(10,237), checkForUpdates, C.BLUE_DARK)
+local updateButton = button(settingsPanel, "CHECK FOR UPDATES", UDim2.new(1,-20,0,30), UDim2.fromOffset(10,292), checkForUpdates, C.BLUE_DARK)
 updateButton.ZIndex = 21
-persistenceLabel = text(settingsPanel, persistenceState, UDim2.new(1,-20,0,24), UDim2.fromOffset(10,273), 7, C.MUTED)
+persistenceLabel = text(settingsPanel, persistenceState, UDim2.new(1,-20,0,24), UDim2.fromOffset(10,326), 7, C.MUTED)
 persistenceLabel.ZIndex = 21
 
 -- Reopen button when minimized
@@ -585,7 +592,7 @@ UIS.InputEnded:Connect(function(input)
  end
 end)
 
--- Theme particles: snow, Halloween leaves, Christmas candy, or Thanksgiving leaves.
+-- Theme particles: seasonal effects plus raining tacos for the Admin Abuse theme.
 task.spawn(function()
  while gui.Parent do
   task.wait(0.32)
@@ -593,13 +600,13 @@ task.spawn(function()
    local leaf = make("TextLabel", {
     BackgroundTransparency = 1, Size = UDim2.fromOffset(math.random(13,21), math.random(13,21)),
     Position = UDim2.new(math.random(2,98)/100, 0, 0, -24),
-    Text = (currentTheme == "HALLOWEEN" or currentTheme == "THANKSGIVING") and ({"🍂","🍁","🍃"})[math.random(1,3)] or (currentTheme == "CHRISTMAS" and ({"🍬","🍭","🎄"})[math.random(1,3)] or ({"❄","❅","❆"})[math.random(1,3)]),
+    Text = currentTheme == "TACO" and "🌮" or ((currentTheme == "HALLOWEEN" or currentTheme == "THANKSGIVING") and ({"🍂","🍁","🍃"})[math.random(1,3)] or (currentTheme == "CHRISTMAS" and ({"🍬","🍭","🎄"})[math.random(1,3)] or ({"❄","❅","❆"})[math.random(1,3]))),
     TextSize = math.random(12,18), TextTransparency = 0.08,
-    Rotation = math.random(-35,35), TextColor3 = currentTheme == "HALLOWEEN" and Color3.fromRGB(255, 143, 45) or (currentTheme == "THANKSGIVING" and ({Color3.fromRGB(230, 105, 35), Color3.fromRGB(205, 55, 38), Color3.fromRGB(235, 183, 57)})[math.random(1,3)] or (currentTheme == "CHRISTMAS" and (math.random(1,2) == 1 and Color3.fromRGB(255, 65, 80) or Color3.fromRGB(70, 230, 125)) or Color3.fromRGB(170, 225, 255))),
+    Rotation = math.random(-35,35), TextColor3 = currentTheme == "TACO" and ({Color3.fromRGB(237, 174, 54), Color3.fromRGB(205, 76, 43), Color3.fromRGB(86, 155, 72)})[math.random(1,3)] or (currentTheme == "HALLOWEEN" and Color3.fromRGB(255, 143, 45) or (currentTheme == "THANKSGIVING" and ({Color3.fromRGB(230, 105, 35), Color3.fromRGB(205, 55, 38), Color3.fromRGB(235, 183, 57)})[math.random(1,3)] or (currentTheme == "CHRISTMAS" and (math.random(1,2) == 1 and Color3.fromRGB(255, 65, 80) or Color3.fromRGB(70, 230, 125)) or Color3.fromRGB(170, 225, 255))),
     Font = Enum.Font.Gotham, BorderSizePixel = 0, Active = false,
     ZIndex = 51
    }, leafLayer)
-   local duration = math.random(28,48)/10
+   local duration = currentTheme == "TACO" and math.random(18,30)/10 or math.random(28,48)/10
    local target = UDim2.new(math.clamp(leaf.Position.X.Scale + math.random(-12,12)/100, 0, 1), 0, 1, 22)
    local tween = TweenService:Create(leaf, TweenInfo.new(duration, Enum.EasingStyle.Linear), {
     Position = target, Rotation = leaf.Rotation + math.random(120,300), TextTransparency = 0.18
@@ -614,7 +621,7 @@ local minimize = button(header, "—", UDim2.fromOffset(22,22), UDim2.new(1,-55,
 end, C.ROW)
 
 -- Apply the saved theme after the UI and minimized button exist.
-if prefs.theme == "HALLOWEEN" or prefs.theme == "CHRISTMAS" then
+if prefs.theme == "HALLOWEEN" or prefs.theme == "CHRISTMAS" or prefs.theme == "THANKSGIVING" or prefs.theme == "TACO" then
  applyTheme(prefs.theme)
 else
  applyTheme("BLUE")
