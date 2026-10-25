@@ -47,6 +47,8 @@ local currentTheme = "BLUE"
 local mini
 local leafLayer
 local SETTINGS_FILE = "ArcticSniper_Settings.json"
+local SCRIPT_VERSION = "1.0.0"
+local VERSION_URL = "https://raw.githubusercontent.com/matthewcastillo2303-sketch/ArcticSniperUpdLayOut/refs/heads/main/ArcticSniper_Version.txt"
 local prefs = {scan = false, scope = false, spam = false, hideUser = false, auto = 5, scale = 0.85, theme = "BLUE"}
 
 -- Persistence depends on executor-provided file APIs.
@@ -432,7 +434,7 @@ local testerBackButton = button(testerPanel, "BACK TO MAIN", UDim2.new(1,-20,0,2
 end, C.ROW)
 testerBackButton.ZIndex = 21
 
--- Settings panel: choose between Arctic Blue, Halloween, and Christmas themes.
+-- Settings panel: themes, persistence, and update checker.
 settingsPanel = make("Frame", {
  Name = "SettingsPanel", Position = UDim2.fromOffset(0,0), Size = UDim2.fromScale(1,1),
  BackgroundColor3 = C.BG, BorderSizePixel = 0, Visible = false, ZIndex = 20
@@ -508,8 +510,37 @@ local backButton = button(settingsPanel, "BACK TO MAIN", UDim2.new(1,-20,0,30), 
  settingsPanel.Visible = false
 end, C.ROW)
 backButton.ZIndex = 21
-text(settingsPanel, "Thanksgiving: harvest colors and falling autumn leaves.", UDim2.new(1,-20,0,30), UDim2.fromOffset(184,148), 8, C.MUTED).ZIndex = 21
-persistenceLabel = text(settingsPanel, persistenceState, UDim2.new(1,-20,0,24), UDim2.fromOffset(10,184), 7, C.MUTED)
+text(settingsPanel, "Thanksgiving: harvest colors and falling autumn leaves.", UDim2.new(1,-20,0,24), UDim2.fromOffset(10,183), 7, C.MUTED).ZIndex = 21
+local versionStatus = text(settingsPanel, "VERSION "..SCRIPT_VERSION.." • NOT CHECKED", UDim2.new(1,-20,0,22), UDim2.fromOffset(10,210), 8, C.MUTED)
+versionStatus.ZIndex = 21
+local function checkForUpdates()
+ versionStatus.Text = "CHECKING FOR UPDATES..."
+ versionStatus.TextColor3 = C.BLUE
+ task.spawn(function()
+  local ok, remoteVersion = pcall(function()
+   return game:HttpGet(VERSION_URL)
+  end)
+  if not ok or type(remoteVersion) ~= "string" then
+   versionStatus.Text = "UPDATE CHECK FAILED • TRY AGAIN"
+   versionStatus.TextColor3 = C.MUTED
+   return
+  end
+  remoteVersion = string.gsub(remoteVersion, "%s+", "")
+  if remoteVersion == "" then
+   versionStatus.Text = "VERSION SERVER EMPTY"
+   versionStatus.TextColor3 = C.MUTED
+  elseif remoteVersion ~= SCRIPT_VERSION then
+   versionStatus.Text = "UPDATE AVAILABLE: "..remoteVersion
+   versionStatus.TextColor3 = C.BLUE
+  else
+   versionStatus.Text = "YOU'RE UP TO DATE • "..SCRIPT_VERSION
+   versionStatus.TextColor3 = C.GREEN
+  end
+ end)
+end
+local updateButton = button(settingsPanel, "CHECK FOR UPDATES", UDim2.new(1,-20,0,30), UDim2.fromOffset(10,237), checkForUpdates, C.BLUE_DARK)
+updateButton.ZIndex = 21
+persistenceLabel = text(settingsPanel, persistenceState, UDim2.new(1,-20,0,24), UDim2.fromOffset(10,273), 7, C.MUTED)
 persistenceLabel.ZIndex = 21
 
 -- Reopen button when minimized
@@ -589,5 +620,9 @@ else
  applyTheme("BLUE")
 end
 if persistenceLabel then persistenceLabel.Text = persistenceState end
+-- Check once on launch; the Settings button can run the check again any time.
+task.delay(1, function()
+ if gui and gui.Parent then checkForUpdates() end
+end)
 
-print("Arctic Sniper Main Screen loaded (local UI demo)")
+print("Arctic Sniper Main Screen loaded (local UI demo) • v"..SCRIPT_VERSION)
